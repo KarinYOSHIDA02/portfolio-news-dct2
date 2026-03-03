@@ -46,13 +46,11 @@ const auth = new google.auth.GoogleAuth({
  * 対象行かどうかを判定する
  * - No が L 始まりは除外
  * - No が 1000〜2999 のみ対象
- * - Notion載せない が "1" は除外
- * - 掲載月 が空欄は除外
+ * - 公開日 が空欄は除外
  */
 const isTarget = (row) => {
   const no = row['No'];
-  const notionExclude = row['Notion載せない'];
-  const month = row['掲載月'];
+  const publicDate = row['公開日'];
 
   if (!no) return false;
   if (String(no).startsWith('L')) return false;
@@ -60,8 +58,7 @@ const isTarget = (row) => {
   const noNum = parseInt(no, 10);
   if (isNaN(noNum) || !(noNum >= 1000 && noNum < 3000)) return false;
 
-  if (notionExclude === '1') return false;
-  if (!month || !month.trim()) return false;
+  if (!publicDate || !publicDate.trim()) return false;
 
   return true;
 };
@@ -77,11 +74,22 @@ const getFund = (no) => {
 };
 
 /**
+ * 公開日（"YYYY/MM/DD ..." or "YYYY/MM/DD"）から YYYYMM を生成
+ */
+const getYearMonth = (raw) => {
+  if (!raw) return null;
+  const match = raw.trim().match(/^(\d{4})\/(\d{2})/);
+  if (!match) return null;
+  return `${match[1]}${match[2]}`;
+};
+
+/**
  * 日付を YYYY/MM/DD から YYYY.MM.DD に変換
  */
 const formatDate = (raw) => {
   if (!raw) return '';
-  return raw.trim().replace(/\//g, '.');
+  // "YYYY/MM/DD HH:MM:SS" → "YYYY.MM.DD" に変換
+  return raw.trim().slice(0, 10).replace(/\//g, '.');
 };
 
 async function main() {
@@ -91,11 +99,12 @@ async function main() {
   const sheets = google.sheets({ version: 'v4', auth: client });
 
   // スプレッドシートデータを取得
+  // 実際の列: A=取得日時, B=ステルス, C=No, D=会社名, E=公開日, F=タイトル, G=詳細, H=リンク, I=配信ステータス
   let response;
   try {
     response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: 'A:K',
+      range: 'A:I',
     });
   } catch (e) {
     console.error('[ERROR] スプレッドシートの取得に失敗しました:', e.message);
@@ -108,11 +117,8 @@ async function main() {
     process.exit(1);
   }
 
-  // ヘッダー行からカラムインデックスを構築
-  // 列定義（仕様書準拠、位置順）:
-  //   A=日付, B=No, C=会社名, D=ステルス, E=タイトル,
-  //   F=リンク, G=カテゴリ①, H=カテゴリ②, I=Notion載せない, J=LINKS, K=掲載月
-  const COL_DEFAULTS = ['日付', 'No', '会社名', 'ステルス', 'タイトル', 'リンク', 'カテゴリ①', 'カテゴリ②', 'Notion載せない', 'LINKS', '掲載月'];
+  // 列定義（実際のスプレッドシートの列順に合わせる）
+  const COL_DEFAULTS = ['取得日時', 'ステルス', 'No', '会社名', '公開日', 'タイトル', '詳細', 'リンク', '配信ステータス'];
   const headerRow = rows[0];
   const colIdx = {};
 
@@ -128,6 +134,8 @@ async function main() {
       colIdx[trimmed] = i;
     }
   });
+
+  console.log('[INFO] 検出された列:', headerRow.map((h, i) => `${String.fromCharCode(65+i)}=${h}`).join(', '));
 
   const get = (row, name) => (row[colIdx[name]] !== undefined ? String(row[colIdx[name]]) : '').trim();
 
@@ -145,22 +153,26 @@ async function main() {
     .filter(isTarget)
     .filter((row) => getFund(row['No']) === FUND_ID);
 
-  // No の昇順にソート（初回投資実行順）
+  // No の昇順にソート
   filtered.sort((a, b) => parseInt(a['No'], 10) - parseInt(b['No'], 10));
 
-  // 掲載月でグループ化
+  // 公開日から掲載月（YYYYMM）を導出してグループ化
   const byMonth = {};
   for (const row of filtered) {
-    const month = row['掲載月'].replace(/\s/g, '');
+    const month = getYearMonth(row['公開日']);
+    if (!month) {
+      console.warn(`[WARN] No=${row['No']} の公開日を解析できません: "${row['公開日']}"`);
+      continue;
+    }
     if (!byMonth[month]) byMonth[month] = [];
     byMonth[month].push({
       no: row['No'],
       company: row['会社名'],
-      cat1: row['カテゴリ①'],
-      cat2: row['カテゴリ②'],
+      cat1: '',  // classify.js で補完する
+      cat2: '',  // classify.js で補完する
       title: row['タイトル'],
       url: row['リンク'],
-      date: formatDate(row['日付']),
+      date: formatDate(row['公開日']),
       img: null, // fetch-ogp.js で補完する
     });
   }
