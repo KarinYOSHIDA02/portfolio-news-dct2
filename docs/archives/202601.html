@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCT-2 Portfolio News</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B1829;
+    --navy-mid: #112240;
+    --navy-light: #1a3357;
+    --accent: #4A90D9;
+    --accent-light: #6aaee8;
+    --text: #e8edf2;
+    --text-muted: #8899aa;
+    --bg: #f4f6f8;
+    --card-bg: #ffffff;
+    --border: #e0e6ed;
+    --tag-bg: #eaf1f8;
+    --tag-color: #2c5f8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: #1a2a3a;
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--navy);
+    background-image:
+      radial-gradient(ellipse at 80% 50%, rgba(74,144,217,0.08) 0%, transparent 60%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234a90d9' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    padding: 64px 0 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74,144,217,0.3), transparent);
+  }
+
+  .hero-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    opacity: 0.9;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  .hero-underline {
+    width: 40px;
+    height: 2px;
+    background: var(--accent);
+    margin-top: 20px;
+  }
+
+  .hero-meta {
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  /* FUND BADGE */
+  .fund-badge {
+    background: var(--navy-mid);
+    border-bottom: 1px solid rgba(74,144,217,0.15);
+  }
+
+  .fund-badge-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+  }
+
+  .fund-label {
+    padding: 14px 24px 14px 0;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    color: #fff;
+    border-bottom: 2px solid var(--accent);
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+  }
+
+  /* MONTH NAV */
+  .month-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .month-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a2a3a;
+  }
+
+  .month-arrow {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--card-bg);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #778899;
+    transition: all 0.15s;
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .month-arrow:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .month-arrow.disabled {
+    opacity: 0.3;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  /* FILTER */
+  .filter-section {
+    margin-bottom: 32px;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+
+  .filter-btn {
+    padding: 7px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1.5px solid var(--border);
+    background: var(--card-bg);
+    color: #556677;
+    font-weight: 400;
+  }
+
+  .filter-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .filter-btn.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #fff;
+  }
+
+  .filter-row-2 .filter-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .filter-row-2 {
+    padding-left: 4px;
+  }
+
+  .result-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* NEWS LIST */
+  .news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .news-item {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .news-item:hover .news-title {
+    color: var(--accent);
+  }
+
+  .news-img-wrap {
+    width: 120px;
+    height: 80px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #dde4ec;
+    flex-shrink: 0;
+  }
+
+  .news-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .news-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #c8d6e5, #dde8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .news-img-placeholder svg {
+    opacity: 0.3;
+  }
+
+  .news-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .news-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .company-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #445566;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 3px;
+    font-size: 11px;
+    background: var(--tag-bg);
+    color: var(--tag-color);
+    font-weight: 400;
+  }
+
+  .news-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: #1a2a3a;
+    transition: color 0.15s;
+  }
+
+  .news-date {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'Syne', sans-serif;
+    letter-spacing: 0.05em;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy);
+    padding: 28px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer .footer-brand {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+  }
+
+  footer .footer-right {
+    font-size: 12px;
+    color: #4a5a6a;
+  }
+
+  @media (max-width: 600px) {
+    .hero-inner, .main { padding: 0 20px; }
+    .hero { padding: 48px 0 36px; }
+    .main { padding: 24px 20px 60px; }
+    .news-item { grid-template-columns: 90px 1fr; gap: 14px; }
+    .news-img-wrap { width: 90px; height: 60px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Portfolio News</p>
+    <h1>News</h1>
+    <div class="hero-underline"></div>
+    <p class="hero-meta">（掲載順は初回投資実行順）</p>
+  </div>
+</header>
+
+<nav class="fund-badge">
+  <div class="fund-badge-inner">
+    <span class="fund-label">DCT-2</span>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="month-nav">
+    <span id="prevBtn" class="month-arrow" role="button" tabindex="0">&#8592;</span>
+    <span class="month-label" id="monthLabel">2026年1月</span>
+    <span id="nextBtn" class="month-arrow" role="button" tabindex="0">&#8594;</span>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-row" id="cat1Filters">
+      <button class="filter-btn active" onclick="setFilter1('all', this)">All</button>
+      <button class="filter-btn" onclick="setFilter1('資金調達', this)">資金調達</button>
+      <button class="filter-btn" onclick="setFilter1('事業進捗', this)">事業進捗</button>
+      <button class="filter-btn" onclick="setFilter1('その他', this)">その他</button>
+    </div>
+    <div class="filter-row filter-row-2" id="cat2Filters" style="display:none;"></div>
+  </div>
+
+  <p class="result-count" id="resultCount"></p>
+
+  <div class="news-list" id="newsList"></div>
+</main>
+
+<footer>
+  <span class="footer-brand">DEEPCORE Portfolio News</span>
+  <span class="footer-right">All rights reserved.</span>
+</footer>
+
+<script>
+/* ===== 注入されるデータ ===== */
+const FUND_ID = "dct2";
+const CURRENT_MONTH = "202601";
+const NEWS_ITEMS = [{"no":"2002","company":"株式会社Resilire","cat1":"その他","cat2":"","title":"株式会社Resilire 代表取締役CEO 津田 裕大が一般社団法人製造DX協会の理事に就任","url":"https://prtimes.jp/main/html/rd/p/000000071.000044535.html","date":"2026.01.13","img":"https://prcdn.freetls.fastly.net/release_image/44535/71/44535-71-53b2e052005f8753cca549a29ef0fb0e-3840x2160.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2002","company":"株式会社Resilire","cat1":"その他","cat2":"","title":"株式会社Resilire、金型の無償保管リスクを可視化する「Resilire ESG 金型管理」の提供を開始","url":"https://prtimes.jp/main/html/rd/p/000000072.000044535.html","date":"2026.01.19","img":"https://prcdn.freetls.fastly.net/release_image/44535/72/44535-72-214da3161acebb418d1b2b0b2a07d46b-1920x1080.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2004","company":"株式会社Yanekara","cat1":"その他","cat2":"","title":"Yanekara、工事不要の家庭用蓄電システム「Yanekara with EcoFlow」の料金体系を刷新。年間利用料を廃止し、19.8万円（税込）の「買い切りモデル」へ移行。","url":"https://prtimes.jp/main/html/rd/p/000000042.000067381.html","date":"2026.01.08","img":"https://prcdn.freetls.fastly.net/release_image/67381/42/67381-42-b3713b5161ebbc4647109c2d6a393a98-1460x642.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2008","company":"株式会社SUPWAT","cat1":"その他","cat2":"","title":"SUPWAT、プレシリーズAラウンドで約2億円を調達","url":"https://prtimes.jp/main/html/rd/p/000000037.000081631.html","date":"2026.01.06","img":"https://prcdn.freetls.fastly.net/release_image/81631/37/81631-37-07af4377ba0e2d4a512be7664075a3c8-624x263.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2013","company":"JITERA PTE. LTD.","cat1":"その他","cat2":"","title":"株式会社Jitera、株式会社インスウェーブジャパンと戦略的パートナーシップ契約を締結","url":"https://prtimes.jp/main/html/rd/p/000000060.000110428.html","date":"2026.01.20","img":"https://prcdn.freetls.fastly.net/release_image/110428/60/110428-60-39f93e6d12deb70c552235bcc68bd85f-960x540.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2013","company":"JITERA PTE. LTD.","cat1":"その他","cat2":"","title":"Jitera、新機能リリースから4か月でAIによる自動生成ドキュメント数が累計10万件を突破","url":"https://prtimes.jp/main/html/rd/p/000000061.000110428.html","date":"2026.01.26","img":"https://prcdn.freetls.fastly.net/release_image/110428/61/110428-61-3bc3af718eb6f33c75f9935b618e014a-2400x1260.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2022","company":"KYCコンサルティング株式会社","cat1":"その他","cat2":"","title":"KYCコンサルティング、エイト・シーズ株式会社と再販代理店契約を締結","url":"https://prtimes.jp/main/html/rd/p/000000077.000044602.html","date":"2026.01.28","img":"https://prcdn.freetls.fastly.net/release_image/44602/77/44602-77-0ef196fdbd343ec66e6fe2609682c808-1797x2700.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2027","company":"株式会社Scalar","cat1":"その他","cat2":"","title":"株式会社Scalar、Kong株式会社とパートナーシップ契約を締結","url":"https://prtimes.jp/main/html/rd/p/000000065.000037795.html","date":"2026.01.21","img":"https://prtimes.jp/common/pc_v4/og.png"},{"no":"2034","company":"株式会社Magic Shields","cat1":"その他","cat2":"","title":"東京都が実施する「都との協働をきっかけとしてスタートアップの成長を支援する『キングサーモンプロジェクト』に株式会社マジックシールズの『ころやわマットセンサー』が採択されました","url":"https://prtimes.jp/main/html/rd/p/000000075.000078980.html","date":"2026.01.09","img":"https://prcdn.freetls.fastly.net/release_image/78980/75/78980-75-e7021dbc02d5428edfa9833952241ff0-2000x1333.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2034","company":"株式会社Magic Shields","cat1":"その他","cat2":"","title":"【日本初】グループホームで転倒骨折リスクを低減する衝撃吸収フロア＆マット『ころやわ(R)』を全27居室導入したエクセレント瑞穂が2026年1月1日(木・祝)オープン","url":"https://prtimes.jp/main/html/rd/p/000000074.000078980.html","date":"2026.01.01","img":"https://prcdn.freetls.fastly.net/release_image/78980/74/78980-74-240049ad41989f286561f60c2854ada9-800x566.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2034","company":"株式会社Magic Shields","cat1":"その他","cat2":"","title":"北欧・デンマークにおいて実施される日本製介護ソリューションの受容性・導入可能性を検証するユーザー参加型PoC（概念実証）にマジックシールズ『ころやわ(R)』が参加、欧州展開を加速","url":"https://prtimes.jp/main/html/rd/p/000000076.000078980.html","date":"2026.01.15","img":"https://prcdn.freetls.fastly.net/release_image/78980/76/78980-76-789fe56fd39d686cd9b80a7553b7baa5-800x533.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2034","company":"株式会社Magic Shields","cat1":"その他","cat2":"","title":"転倒時の骨折リスクを低減する衝撃吸収フロア＆マット『ころやわ(R)』が、2025年通期で同カテゴリ年間販売数1位を達成","url":"https://prtimes.jp/main/html/rd/p/000000077.000078980.html","date":"2026.01.29","img":"https://prcdn.freetls.fastly.net/release_image/78980/77/78980-77-e11fcd3c2567cac61b41bf896c60c141-3900x2600.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2046","company":"株式会社Srush","cat1":"その他","cat2":"","title":"株式会社Srush、前期比200%成長に伴い「第2創業期」へ。3カンパニー制の導入と経営体制強化、本社増床移転のお知らせ","url":"https://prtimes.jp/main/html/rd/p/000000077.000070907.html","date":"2026.01.05","img":"https://prcdn.freetls.fastly.net/release_image/70907/77/70907-77-3c74feaf819e6a9cfbf0685a77f9a159-1776x1090.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2046","company":"株式会社Srush","cat1":"その他","cat2":"","title":"”お客様と一緒に商品を作り上げる、食品の企画開発のプロ集団”ジェイ・ファームが、「Srush AI」を導入し、需要予測に基づく発注計画の高度化を開始","url":"https://prtimes.jp/main/html/rd/p/000000078.000070907.html","date":"2026.01.28","img":"https://prcdn.freetls.fastly.net/release_image/70907/78/70907-78-56c872874d08d68538c3633e001618db-1920x1080.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2050","company":"株式会社GenerativeX","cat1":"その他","cat2":"","title":"生成AIの企業活用と成果創出を議論する自社カンファレンス「GenerativeX Summit 2026」を2月26日(木)に開催","url":"https://prtimes.jp/main/html/rd/p/000000031.000124664.html","date":"2026.01.13","img":"https://prcdn.freetls.fastly.net/release_image/124664/31/124664-31-af1433e5be275a18d14a40fadad708eb-1154x653.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2050","company":"株式会社GenerativeX","cat1":"その他","cat2":"","title":"GenerativeX、事業成長を見据え経営体制を強化","url":"https://prtimes.jp/main/html/rd/p/000000032.000124664.html","date":"2026.01.21","img":"https://prcdn.freetls.fastly.net/release_image/124664/32/124664-32-1216119684cdff17f4629160cc985412-1920x1080.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2055","company":"株式会社immedio","cat1":"その他","cat2":"","title":"受注につながる商談をどう増やすか？immedio、「Sales Enablement EXPO 2026」にて商談獲得自動化の最新ノウハウを公開","url":"https://prtimes.jp/main/html/rd/p/000000225.000106428.html","date":"2026.01.08","img":"https://prcdn.freetls.fastly.net/release_image/106428/225/106428-225-80c048ef8c6cf78c941e7eb2d9d2233e-1999x735.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2055","company":"株式会社immedio","cat1":"その他","cat2":"","title":"自動化で攻める「テックタッチ」か、人で攻める「営業代行」か。immedioとネオキャリアが語る、商談創出の最適解とは","url":"https://prtimes.jp/main/html/rd/p/000000224.000106428.html","date":"2026.01.13","img":"https://prcdn.freetls.fastly.net/release_image/106428/224/106428-224-6b4edcd7ae89bd6bb00e49134feebd03-1024x592.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2055","company":"株式会社immedio","cat1":"その他","cat2":"","title":"ホットリードを逃さない仕組みで商談化率70％超へ。immedioが支える、ビースタイルメディアの商談創出自動化","url":"https://prtimes.jp/main/html/rd/p/000000219.000106428.html","date":"2026.01.14","img":"https://prcdn.freetls.fastly.net/release_image/106428/219/106428-219-d43080e3298c91dedceb73cf557b2933-1440x810.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2055","company":"株式会社immedio","cat1":"その他","cat2":"","title":"展示会リードの即日商談化とIS工数削減を同時に実現。 インターファクトリーがimmedio Formsで営業プロセスを刷新","url":"https://prtimes.jp/main/html/rd/p/000000223.000106428.html","date":"2026.01.20","img":"https://prcdn.freetls.fastly.net/release_image/106428/223/106428-223-b5a5dba36f47b85844a2d4be7b20318b-1800x1013.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2055","company":"株式会社immedio","cat1":"その他","cat2":"","title":"調査レポート｜immedioが分析するインサイドセールスのKPI変遷を4年分で比較「行動量」から「接続数」へ移行する現場の実態","url":"https://prtimes.jp/main/html/rd/p/000000220.000106428.html","date":"2026.01.21","img":"https://prcdn.freetls.fastly.net/release_image/106428/220/106428-220-49c1035906ab303fcc49f84b362b2e27-1440x810.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2055","company":"株式会社immedio","cat1":"その他","cat2":"","title":"【1/29開催】immedio、マーケティングコミットと共催ウェビナー。「2026年のトレンド大予想！なぜ、御社のインバウンドリードは商談につながらないのか」","url":"https://prtimes.jp/main/html/rd/p/000000229.000106428.html","date":"2026.01.27","img":"https://prcdn.freetls.fastly.net/release_image/106428/229/106428-229-cee3761d86e238701ea2cbf9442ec948-1999x1125.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2055","company":"株式会社immedio","cat1":"その他","cat2":"","title":"iOS電話スクリーニング時代、新規営業はどう変わるのか","url":"https://prtimes.jp/main/html/rd/p/000000230.000106428.html","date":"2026.01.28","img":"https://prcdn.freetls.fastly.net/release_image/106428/230/106428-230-93fe041d2e1ce236a0490309a2e068ce-747x420.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2055","company":"株式会社immedio","cat1":"その他","cat2":"","title":"調査レポート｜全国のインサイドセールス職に聞いたAI活用実態。主流は「コンテンツ作成支援」、営業活動の支援領域で利用が定着。～自社サイト流入の維持・拡大に向けたWeb施策は「コンテンツの質向上」～","url":"https://prtimes.jp/main/html/rd/p/000000222.000106428.html","date":"2026.01.29","img":"https://prcdn.freetls.fastly.net/release_image/106428/222/106428-222-979cc9dba1de4eda85da8bf73061cf4c-2880x1620.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2056","company":"株式会社パタンナー","cat1":"その他","cat2":"","title":"【生成AI時代に企業が競争優位を築くための\"データの筋肉\"】データインテリジェンス解説書を無料公開！","url":"https://prtimes.jp/main/html/rd/p/000000097.000105601.html","date":"2026.01.08","img":"https://prcdn.freetls.fastly.net/release_image/105601/97/105601-97-394b88245f09c992060728e8e62110e2-1200x630.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2056","company":"株式会社パタンナー","cat1":"その他","cat2":"","title":"【なんとなくDXから脱却し、投資の優先順位を見極める】データアセスメント実践ガイドを無料公開！","url":"https://prtimes.jp/main/html/rd/p/000000096.000105601.html","date":"2026.01.06","img":"https://prcdn.freetls.fastly.net/release_image/105601/96/105601-96-2a5bb1a35ffb90e82a6179c22e2340bb-1199x630.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2056","company":"株式会社パタンナー","cat1":"その他","cat2":"","title":"株式会社パタンナー、専門組織に頼らず“現場主導”でデータを武器にする「データマネジメント実践研修」を提供開始","url":"https://prtimes.jp/main/html/rd/p/000000100.000105601.html","date":"2026.01.13","img":"https://prcdn.freetls.fastly.net/release_image/105601/100/105601-100-e72d0c15d1925e3c52bd62b9d78f7d4f-1200x630.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2056","company":"株式会社パタンナー","cat1":"その他","cat2":"","title":"【トヨタ自動車×DX支援事例】ハードウェアエンジニアを、データとビジネスを繋ぐ「BRIDGE人材」へ。\"SDV時代の組織変革ストーリー\"を公開。","url":"https://prtimes.jp/main/html/rd/p/000000101.000105601.html","date":"2026.01.21","img":"https://prcdn.freetls.fastly.net/release_image/105601/101/105601-101-665df649456ce4c37122eb754b6afd21-2752x1536.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2056","company":"株式会社パタンナー","cat1":"その他","cat2":"","title":"【脱・エクセル集計地獄】Googleスプレッドシート×Looker Studioで実現する「壊れない」レポート自動化。設計・運用バイブルを無料公開","url":"https://prtimes.jp/main/html/rd/p/000000102.000105601.html","date":"2026.01.28","img":"https://prcdn.freetls.fastly.net/release_image/105601/102/105601-102-3c014ca568f4ff06bc8bcb025fb4f52b-2752x1536.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2057","company":"Aokumo 株式会社","cat1":"その他","cat2":"","title":"Aokumo株式会社、クラウドネイティブ成熟度診断ツール「アオナビ診断」をオープンソースで公開","url":"https://prtimes.jp/main/html/rd/p/000000014.000089775.html","date":"2026.01.06","img":"https://prcdn.freetls.fastly.net/release_image/89775/14/89775-14-1923422c6d183bdac104c9f04114fea5-2329x979.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2060","company":"nat株式会社","cat1":"その他","cat2":"","title":"令和7年度 インフラDX大賞 「スタートアップ奨励賞」受賞のお知らせ","url":"https://prtimes.jp/main/html/rd/p/000000038.000046540.html","date":"2026.01.13","img":"https://prcdn.freetls.fastly.net/release_image/46540/38/46540-38-2d8862ce928f741fe5ebd1b0b10d6eef-3900x2911.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2063","company":"株式会社Wunderbar","cat1":"その他","cat2":"","title":"今泉佑唯さんの素材が最短1ヶ月から広告利用可能に！","url":"https://prtimes.jp/main/html/rd/p/000000200.000082736.html","date":"2026.01.14","img":"https://prcdn.freetls.fastly.net/release_image/82736/200/82736-200-c7dd64d1d56593b045c3574a09233e2c-2925x1646.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2066","company":"株式会社NEXTAGE","cat1":"その他","cat2":"","title":"株式会社NEXTAGE、横浜みなとみらいに「みなとみらいイノベーションベース（MMIB）」を新規開設","url":"https://prtimes.jp/main/html/rd/p/000000031.000063114.html","date":"2026.01.05","img":"https://prcdn.freetls.fastly.net/release_image/63114/31/63114-31-fb08e1571c138295d51a6e6cc7c9fec4-731x820.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2067","company":"株式会社Neautech","cat1":"その他","cat2":"","title":"2026年は\"続く美容\"元年に。美容医療継続率3割の今、9割が求める「かかりつけ美容医療」という新習慣","url":"https://prtimes.jp/main/html/rd/p/000000033.000100322.html","date":"2026.01.20","img":"https://prcdn.freetls.fastly.net/release_image/100322/33/100322-33-fa5a884fd40b0a41bad897f56553e0be-1096x595.png?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"},{"no":"2070","company":"AstroX株式会社","cat1":"その他","cat2":"","title":"民間宇宙スタートアップAstroX CSOの東後澄人が取締役に就任","url":"https://prtimes.jp/main/html/rd/p/000000024.000101722.html","date":"2026.01.13","img":"https://prcdn.freetls.fastly.net/release_image/101722/24/101722-24-9cb5cbc7197781e69afa278e1367b3a2-3859x2171.jpg?format=jpeg&amp;auto=webp&amp;fit=bounds&amp;width=2400&amp;height=1260"}];
+const PREV_URL = null;
+const NEXT_URL = "202602.html";
+
+/* ===== カテゴリ定義 ===== */
+const SUB_CATS = {
+  '資金調達': [],
+  '事業進捗': ['プロダクト', 'パートナーシップ', '導入事例'],
+  'その他': ['特集', '受賞・採択', '出版・発信', '組織・人事'],
+};
+
+/* ===== 状態 ===== */
+let currentCat1 = 'all';
+let currentCat2 = 'all';
+
+/* ===== ユーティリティ ===== */
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* ===== ナビゲーション ===== */
+function setupNav() {
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  if (PREV_URL) {
+    prevBtn.style.cursor = 'pointer';
+    prevBtn.addEventListener('click', () => { window.location.href = PREV_URL; });
+    prevBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter') window.location.href = PREV_URL; });
+  } else {
+    prevBtn.classList.add('disabled');
+  }
+
+  if (NEXT_URL) {
+    nextBtn.style.cursor = 'pointer';
+    nextBtn.addEventListener('click', () => { window.location.href = NEXT_URL; });
+    nextBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter') window.location.href = NEXT_URL; });
+  } else {
+    nextBtn.classList.add('disabled');
+  }
+}
+
+/* ===== フィルター ===== */
+function setFilter1(cat, btn) {
+  currentCat1 = cat;
+  currentCat2 = 'all';
+  document.querySelectorAll('#cat1Filters .filter-btn').forEach((b) => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateSubFilters();
+  render();
+}
+
+function setFilter2(cat, btn) {
+  currentCat2 = cat;
+  document.querySelectorAll('#cat2Filters .filter-btn').forEach((b) => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function updateSubFilters() {
+  const row2 = document.getElementById('cat2Filters');
+  const subs = SUB_CATS[currentCat1] || [];
+
+  if (currentCat1 === 'all' || subs.length === 0) {
+    row2.style.display = 'none';
+    return;
+  }
+
+  row2.innerHTML =
+    '<button class="filter-btn active" onclick="setFilter2(\'all\',this)">すべて</button>' +
+    subs.map((s) => `<button class="filter-btn" onclick="setFilter2('${escHtml(s)}',this)">${escHtml(s)}</button>`).join('');
+  row2.style.display = 'flex';
+}
+
+/* ===== レンダリング ===== */
+function placeholderSvg() {
+  return `<div class="news-img-placeholder"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="3" fill="#aabbcc"/><path d="M4 17l5-5 3 3 4-5 4 6H4z" fill="white" opacity="0.6"/></svg></div>`;
+}
+
+function render() {
+  const filtered = NEWS_ITEMS.filter((n) => {
+    if (currentCat1 !== 'all' && n.cat1 !== currentCat1) return false;
+    if (currentCat2 !== 'all' && n.cat2 !== currentCat2) return false;
+    return true;
+  });
+
+  document.getElementById('resultCount').textContent = `${filtered.length}件の記事`;
+
+  const list = document.getElementById('newsList');
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<p style="color:var(--text-muted);font-size:14px;padding:40px 0;">この月のニュースはありません。</p>';
+    return;
+  }
+
+  list.innerHTML = filtered.map((n) => {
+    const imgHtml = n.img
+      ? `<img src="${escHtml(n.img)}" alt="${escHtml(n.company)}" loading="lazy" onerror="this.parentElement.innerHTML='${placeholderSvg().replace(/'/g, "\\'")}';">`
+      : placeholderSvg();
+
+    const tagHtml = n.cat2
+      ? `<span class="tag">${escHtml(n.cat2)}</span>`
+      : n.cat1 && n.cat1 !== 'all'
+        ? `<span class="tag">${escHtml(n.cat1)}</span>`
+        : '';
+
+    return `
+    <a class="news-item" href="${escHtml(n.url)}" target="_blank" rel="noopener noreferrer">
+      <div class="news-img-wrap">${imgHtml}</div>
+      <div class="news-body">
+        <div class="news-meta">
+          <span class="company-name">${escHtml(n.company)}</span>
+          ${tagHtml}
+        </div>
+        <p class="news-title">${escHtml(n.title)}</p>
+        <span class="news-date">${escHtml(n.date)}</span>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+/* ===== 初期化 ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  setupNav();
+  render();
+});
+</script>
+</body>
+</html>
