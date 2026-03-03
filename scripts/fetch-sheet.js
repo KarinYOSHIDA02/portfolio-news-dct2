@@ -104,7 +104,7 @@ async function main() {
   try {
     response = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
-      range: '2026年度データベース!A:I',
+      range: "'2026年度データベース'!A:I",
     });
   } catch (e) {
     console.error('[ERROR] スプレッドシートの取得に失敗しました:', e.message);
