@@ -225,7 +225,7 @@ async function main() {
 
   if (newItems.length === 0) {
     console.log('[INFO] 追加する新着ニュースはありません');
-    await sendSlack({ text: `📭 Portfolio News（${fundLabel}）: 新着ニュースなし`, blocks: [{ type: 'section', text: { type: 'mrkdwn', text: `*📭 新着ニュースなし（${fundLabel}）*\n追加対象のニュースはありませんでした。` } }] });
+    await sendSlack({ text: `${fundLabel}: 今週の新着ニュースはありませんでした` });
     return;
   }
 
@@ -309,35 +309,9 @@ async function main() {
 
   // ===== 10. Slack 通知 =====
   const sheetBUrl = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_B_ID}/edit`;
-  const actionsBaseUrl = FUND_ID === 'dct1'
-    ? 'https://github.com/KarinYOSHIDA02/portfolio-news-dct1/actions/workflows/generate.yml'
-    : 'https://github.com/KarinYOSHIDA02/portfolio-news-dct2/actions/workflows/generate.yml';
-
-  const maxDisplay = 15;
-  const itemLines = classifiedItems.slice(0, maxDisplay).map((item, i) => {
-    const catLabel = item.cat1 ? `[${item.cat1}${item.cat2 ? `/${item.cat2}` : ''}]` : '[未分類]';
-    const excludeMark = item.notionExclude === '1' ? ' ⚠️除外' : '';
-    return `${i + 1}. *${item.会社名}* ${catLabel}${excludeMark}\n   ${item.タイトル}`;
-  });
-  if (classifiedItems.length > maxDisplay) {
-    itemLines.push(`_...他 ${classifiedItems.length - maxDisplay} 件_`);
-  }
-
-  const excludeCount = classifiedItems.filter(i => i.notionExclude === '1').length;
 
   await sendSlack({
-    text: `📰 Portfolio News（${fundLabel}）: ${classifiedItems.length}件追加（${excludeCount}件除外判定）`,
-    blocks: [
-      { type: 'header', text: { type: 'plain_text', text: `📰 新着 ${classifiedItems.length}件 追加・AI分類完了（${fundLabel}）`, emoji: true } },
-      { type: 'section', text: { type: 'mrkdwn', text: `スプレッドシートBに追加し、AI分類を実行しました。\n掲載: *${classifiedItems.length - excludeCount}件* / 除外判定: *${excludeCount}件*\n\n確認・修正後、*「▶️ HTML生成を実行」*ボタンを押してください。` } },
-      { type: 'section', text: { type: 'mrkdwn', text: itemLines.join('\n\n') } },
-      { type: 'divider' },
-      { type: 'context', elements: [{ type: 'mrkdwn', text: '💡 *確認ポイント*: カテゴリ・Notion載せない・掲載月 を確認し、必要に応じて修正してください。' }] },
-      { type: 'actions', elements: [
-        { type: 'button', text: { type: 'plain_text', text: '📊 スプレッドシートを確認', emoji: true }, url: sheetBUrl, style: 'primary' },
-        { type: 'button', text: { type: 'plain_text', text: '▶️ HTML生成を実行', emoji: true }, url: actionsBaseUrl },
-      ] },
-    ],
+    text: `@karinyoshida 今月分のLP報告データを確認してください ${sheetBUrl}`,
   });
 
   console.log(`[INFO] 完了: ${classifiedItems.length} 件を追加（AI分類済み）`);
