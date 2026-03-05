@@ -58,7 +58,7 @@ const getCell = (row, colIdx, name) => (row[colIdx[name]] !== undefined ? String
 
 // ── AI 分類 ────────────────────────────────────────────────────────────
 
-const CLASSIFY_MODEL = 'claude-sonnet-4-20250514';
+const CLASSIFY_MODEL = 'claude-sonnet-4-6-20250514';
 
 const buildClassifyPrompt = (title, company, url) => `あなたはスタートアップ企業のニュースを分類するアシスタントです。
 
@@ -143,7 +143,8 @@ async function classifyItem(anthropic, title, company, url) {
       reason: json.reason || '',
     };
   } catch (e) {
-    console.warn(`  [WARN] 分類失敗: ${e.message}`);
+    console.error(`  [ERROR] 分類失敗 "${title.slice(0, 40)}": ${e.message}`);
+    if (e.status) console.error(`    HTTP status: ${e.status}, type: ${e.error?.error?.type || 'unknown'}`);
     return { cat1: 'その他', cat2: '', notionExclude: '', reason: '' };
   }
 }
