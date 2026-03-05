@@ -80,10 +80,23 @@ async function main() {
   }
 
   const cache = JSON.parse(fs.readFileSync(cachePath, 'utf-8'));
+
+  // TARGET_MONTHS でフィルタ（例: "202602" or "202601,202602"）
+  const targetMonths = process.env.TARGET_MONTHS
+    ? process.env.TARGET_MONTHS.split(',').map(m => m.trim()).filter(Boolean)
+    : null;
+
+  if (targetMonths && targetMonths.length > 0) {
+    console.log(`[INFO] 対象月フィルタ: ${targetMonths.join(', ')}`);
+    for (const key of Object.keys(cache)) {
+      if (!targetMonths.includes(key)) delete cache[key];
+    }
+  }
+
   const months = Object.keys(cache);
 
   if (months.length === 0) {
-    console.error('[ERROR] news-cache.json にデータがありません');
+    console.error('[ERROR] 対象月のデータがありません');
     process.exit(1);
   }
 

@@ -4,7 +4,12 @@ on:
   schedule:
     # 毎月1日 午前9時 JST（= UTC 00:00）に実行
     - cron: '0 0 1 * *'
-  workflow_dispatch: # GitHub UI から手動実行可能
+  workflow_dispatch:
+    inputs:
+      target_months:
+        description: '対象月（例: 202602 または 202601,202602）空欄=全月'
+        required: false
+        default: ''
 
 jobs:
   generate:
@@ -43,6 +48,8 @@ jobs:
 
       - name: Generate HTML
         run: node scripts/generate-html.js
+        env:
+          TARGET_MONTHS: ${{ github.event.inputs.target_months }}
 
       - name: Commit and push
         run: |
