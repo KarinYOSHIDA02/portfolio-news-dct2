@@ -63,6 +63,10 @@ function generatePage(template, { items, month, sortedMonths, isIndex }) {
   const now = new Date();
   const updatedDate = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
 
+  // index.html → "assets/", archives/YYYYMM.html → "../assets/"
+  const assetsPath = isIndex ? 'assets/' : '../assets/';
+
+  html = inject(html, '__ASSETS_PATH__', assetsPath);
   html = inject(html, '__FUND_LABEL__', FUND_LABEL);
   html = inject(html, '__FUND_ID__', FUND_ID);
   html = inject(html, '__CURRENT_MONTH__', month);
