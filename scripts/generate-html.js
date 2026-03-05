@@ -13,7 +13,7 @@ const fs = require('fs');
 const path = require('path');
 
 const FUND_ID = process.env.FUND_ID || 'dct1';
-const FUND_LABEL = FUND_ID === 'dct1' ? 'DCT-1' : 'DCT-2';
+const FUND_LABEL = FUND_ID === 'dct1' ? 'DEEPCORE TOKYO 1号ファンド' : 'DEEPCORE TOKYO 2号ファンド';
 
 /**
  * YYYYMM → "YYYY年M月" に変換

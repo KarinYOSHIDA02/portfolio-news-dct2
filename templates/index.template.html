@@ -330,12 +330,45 @@
     color: #4a5a6a;
   }
 
+  .print-btn {
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: var(--card-bg);
+    color: #556677;
+    transition: all 0.15s;
+    margin-left: auto;
+  }
+
+  .print-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
   @media (max-width: 600px) {
     .hero-inner, .main { padding: 0 20px; }
     .hero { padding: 48px 0 36px; }
     .main { padding: 24px 20px 60px; }
     .news-item { grid-template-columns: 90px 1fr; gap: 14px; }
     .news-img-wrap { width: 90px; height: 60px; }
+  }
+
+  @media print {
+    .hero { padding: 24px 0 16px; }
+    .hero h1 { font-size: 28px; }
+    .hero-meta { display: none; }
+    .fund-badge { break-after: avoid; }
+    .filter-section, .month-arrow, .print-btn { display: none !important; }
+    .main { padding: 16px 0; }
+    .month-nav { margin-bottom: 12px; }
+    .news-item { break-inside: avoid; padding: 12px 0; gap: 14px; }
+    .news-img-wrap { width: 90px; height: 60px; }
+    .news-item { grid-template-columns: 90px 1fr; }
+    footer { display: none; }
+    body { background: #fff; }
   }
 </style>
 </head>
@@ -362,6 +395,7 @@
     <span id="prevBtn" class="month-arrow" role="button" tabindex="0">&#8592;</span>
     <span class="month-label" id="monthLabel">__MONTH_LABEL__</span>
     <span id="nextBtn" class="month-arrow" role="button" tabindex="0">&#8594;</span>
+    <button class="print-btn" onclick="window.print()">PDF出力</button>
   </div>
 
   <div class="filter-section">
