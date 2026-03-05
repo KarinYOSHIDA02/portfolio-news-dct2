@@ -58,7 +58,7 @@ const getCell = (row, colIdx, name) => (row[colIdx[name]] !== undefined ? String
 
 // ── AI 分類 ────────────────────────────────────────────────────────────
 
-const CLASSIFY_MODEL = 'claude-sonnet-4-6-20250514';
+const CLASSIFY_MODEL = 'claude-sonnet-4-6';
 
 const buildClassifyPrompt = (title, company, url) => `あなたはスタートアップ企業のニュースを分類するアシスタントです。
 
