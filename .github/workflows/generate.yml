@@ -52,18 +52,45 @@ jobs:
         env:
           TARGET_MONTHS: ${{ github.event.inputs.target_months }}
 
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "[INFO] 変更なし — PRは作成しません"
+          fi
+
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: "chore: update portfolio news"
-          branch: update-news
-          delete-branch: true
-          title: "ニュース更新プレビュー"
-          body: |
-            スプレッドシートBの最新データからHTMLを生成しました。
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="update-news"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git add -A
+          git commit -m "chore: update portfolio news"
+          git push -f origin "$BRANCH"
 
-            **確認手順:**
-            1. 下の Files changed タブでHTMLの差分を確認
-            2. OKならこのPRをマージ → サイトに公開されます
+          # 既存PRがあればスキップ、なければ作成
+          EXISTING=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            echo "[INFO] 既存PR #$EXISTING を更新しました"
+          else
+            gh pr create \
+              --title "ニュース更新プレビュー" \
+              --body "$(cat <<'EOF'
+          スプレッドシートBの最新データからHTMLを生成しました。
 
-            対象月: ${{ github.event.inputs.target_months || '全月' }}
+          **確認手順:**
+          1. 下の Files changed タブでHTMLの差分を確認
+          2. OKならこのPRをマージ → サイトに公開されます
+
+          対象月: ${{ github.event.inputs.target_months || '全月' }}
+          EOF
+          )"
+            echo "[INFO] PRを作成しました"
+          fi
